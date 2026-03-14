@@ -1,4 +1,4 @@
-export interface IRole{
- name:string
- description?:string
+export interface IRole {
+  name: "Admin" | "Manager" | "Agent" | "Customer"
+  description?: string
 }
