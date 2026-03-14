@@ -1,27 +1,12 @@
-import { UserModel } from "../user/user.model"
-import { comparePassword, hashPassword } from "../../utils/hash"
-import { createAccessToken, createRefreshToken } from "../../utils/jwt"
-import { config } from "../../config"
+import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import { UserModel } from "../user/user.model"
+ 
 
-
-export const registerUser = async (payload: any) => {
-
-  const { name, email, password, role } = payload
-
-  const hashedPassword = await hashPassword(password)
-
-  const user = await UserModel.create({
-    name,
-    email,
-    password: hashedPassword,
-    role
-  })
-
-  return user
-}
-
-export const loginUser = async(email:string,password:string)=>{
+const loginUser = async(
+ email:string,
+ password:string
+)=>{
 
  const user = await UserModel.findOne({email})
 
@@ -29,40 +14,28 @@ export const loginUser = async(email:string,password:string)=>{
   throw new Error("User not found")
  }
 
- const match = await comparePassword(password,user.password)
+ const match = await bcrypt.compare(
+  password,
+  user.password
+ )
 
  if(!match){
   throw new Error("Password incorrect")
  }
 
  const payload = {
-  id:user._id,
-  role:user.role
+  id:user._id
  }
 
- const accessToken = createAccessToken(payload)
- const refreshToken = createRefreshToken(payload)
-
- return {
-  accessToken,
-  refreshToken
- }
-}
-
-
-export const refreshTokenService = (token:string)=>{
-
- const decoded:any = jwt.verify(
-  token,
-  config.jwt_refresh_secret as string
+ const token = jwt.sign(
+  payload,
+  process.env.JWT_SECRET as string,
+  {expiresIn:"15m"}
  )
 
- const payload = {
-  id:decoded.id,
-  role:decoded.role
- }
+ return token
+}
 
- const accessToken = createAccessToken(payload)
-
- return accessToken
+export const AuthService = {
+ loginUser
 }
