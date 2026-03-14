@@ -21,13 +21,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // routes
-app.use("/auth", AuthRoutes);
+app.use("/api/v1/auth", AuthRoutes);
 
-app.use("/users",UserRoutes)
+app.use("/api/v1/users",UserRoutes)
 
-app.use("/roles",RoleRoutes)
+app.use("/api/v1/roles",RoleRoutes)
 
-app.use("/permissions",PermissionRoutes)
+app.use("/api/v1/permissions",PermissionRoutes)
 
 // database connection + server start
 async function startServer() {

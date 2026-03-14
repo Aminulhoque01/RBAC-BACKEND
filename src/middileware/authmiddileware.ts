@@ -1,20 +1,18 @@
+import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
-import { config } from "../config"
 
-export const authMiddleware = (req:any,res:any,next:any)=>{
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization
+  if (!authHeader) return res.status(401).json({ success:false, message: "No token" })
 
- const token = req.headers.authorization?.split(" ")[1]
+  const token = authHeader.split(" ")[1]
+  if (!token) return res.status(401).json({ success:false, message: "No token" })
 
- if(!token){
-  return res.status(401).json({message:"Unauthorized"})
- }
-
- const decoded = jwt.verify(
-  token,
-  config.jwt_access_secret as string
- )
-
- req.user = decoded
-
- next()
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as any
+    req.user = { id: decoded.id } // ✅ attach user to request
+    next()
+  } catch (err) {
+    return res.status(401).json({ success:false, message: "Invalid token" })
+  }
 }

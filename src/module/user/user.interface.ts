@@ -5,9 +5,6 @@ export interface IUser {
   email: string
   password: string
   role: Types.ObjectId
-  permissions: Types.ObjectId[]
+  customPermissions: Types.ObjectId[]
   status: "active" | "suspended" | "banned"
 }
-
-
- 
