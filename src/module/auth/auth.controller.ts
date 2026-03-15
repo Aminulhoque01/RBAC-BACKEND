@@ -6,12 +6,9 @@ export const login = async (req:Request,res:Response) => {
   try {
     const tokens = await AuthService.loginUser(email, password)
     // Send refresh token as HttpOnly cookie
-      res.cookie("refreshToken", tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // localhost e false
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie("refreshToken", tokens.refreshToken, 
+      { httpOnly:true, secure:true, sameSite:"strict", maxAge:7*24*60*60*1000 }
+    )
     res.json({ success:true, accessToken: tokens.accessToken })
   } catch(err:any) {
     res.status(400).json({ success:false, message: err.message })
