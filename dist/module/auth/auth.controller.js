@@ -16,7 +16,12 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tokens = yield auth_service_1.AuthService.loginUser(email, password);
         // Send refresh token as HttpOnly cookie
-        res.cookie("refreshToken", tokens.refreshToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 7 * 24 * 60 * 60 * 1000 });
+        res.cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // localhost e false
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
         res.json({ success: true, accessToken: tokens.accessToken });
     }
     catch (err) {
